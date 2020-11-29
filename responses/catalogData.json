@@ -1,3 +1,6 @@
+// Создаем каталог в формате js который будет доступен зщ адресу
+// https://raw.githubusercontent.com/lotostoi/GeekBrains-project/homework/responses/catalogData.json
+
 [
   {
     "id": 1,
