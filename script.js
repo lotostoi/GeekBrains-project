@@ -3,7 +3,7 @@ const CATALOG_URL =
   'https://raw.githubusercontent.com/lotostoi/GeekBrains-project/homework/responses/catalogData.json'
 
 fetch(CATALOG_URL)
-  .then((data) => data.json)
+  .then((data) => data.json())
   .then((data) => console.log(data))
 
 class Cart {
