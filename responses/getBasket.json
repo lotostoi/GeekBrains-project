@@ -1,0 +1,18 @@
+{
+  "amount": 3000,
+  "countGoods": 2,
+  "contents": [
+    {
+      "id": 898,
+      "title": "Computer",
+      "price": 1000,
+      "quantity": 1
+    },
+    {
+      "id": 456,
+      "title": "Keyboard",
+      "price": 2000,
+      "quantity": 1
+    }
+  ]
+}
