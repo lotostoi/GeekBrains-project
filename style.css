@@ -2433,3 +2433,11 @@ input.regField {
 .checkout__line:last-child {
     margin-bottom: 90px;
 }
+
+
+.hiden {
+    display: block;
+}
+.active {
+    display: flex;
+}
