@@ -14,21 +14,23 @@
     <div class="header container">
       <div class="header-right">
         <div id="cart">
+          <h3 class="header__toCatalog ">
+            Shope
+          </h3>
           <div class="header__cart">
-            <img src="img/cart.svg" alt="cart" />
+            <span class="header__cart-quantity">0</span>
+            <span class="header__cart-sum">0</span>
+            <img src="img/cart.svg" class="header__cart-img" alt="cart" />
           </div>
         </div>
       </div>
     </div>
-    <div class="container">
-      <div class="catalogue">
-      
-         <!-- место для рендеринга товров каталога -->
-      </div>
+    <div class="container catalogue">
+      <!-- место для рендеринга товров каталога -->
     </div>
-    <!-- пока закоментированная корзина, чуть позже мы ее доделаем  -->
-  <!--   <div class="productsCart">
+    <div class="productsCart hiden">
       <div class="container">
+        <h1>Cart</h1>
         <div class="productLine">
           <div class="productDetails">
             <p class="productFeatures_header">Product Details</p>
@@ -49,95 +51,16 @@
             <p class="productFeatures_header">ACTION</p>
           </div>
         </div>
-        <div class="shoppingCart-line"></div>
-        <div class="productLine">
-          <div class="productDetails">
-            <div class="productDetails__photo"><a href="#"><img src="img/shopCart_product1.png" alt="t-shirt1"></a>
-            </div>
-            <div class="productDetails__description">
-              <h2>Mango People T-shirt</h2>
-              <p>Color:<span>Red</span></p>
-              <p>Size:<span>Xll</span></p>
-            </div>
-          </div>
-          <div class="unitPrice">
-            <p class="productFeatures">$150</p>
-          </div>
-          <div class="quantity">
-            <input class="productFeatures" type="number">
-          </div>
-          <div class="shipping">
-            <p class="productFeatures">FREE</p>
-          </div>
-          <div class="subtotal">
-            <p class="productFeatures">$300</p>
-          </div>
-          <div class="action">
-            <p class="productFeatures"><a href="#"><i class="fas fa-times-circle"></i></a></p>
-          </div>
-        </div>
-        <div class="shoppingCart-line"></div>
-        <div class="productLine">
-          <div class="productDetails">
-            <div class="productDetails__photo"><a href="#"><img src="img/shopCart_product2.png" alt="t-shirt2"></a>
-            </div>
-            <div class="productDetails__description">
-              <h2>Mango People T-shirt</h2>
-              <p>Color:<span>Red</span></p>
-              <p>Size:<span>Xll</span></p>
-            </div>
-          </div>
-          <div class="unitPrice">
-            <p class="productFeatures">$150</p>
-          </div>
-          <div class="quantity">
-            <input class="productFeatures" type="number">
-          </div>
-          <div class="shipping">
-            <p class="productFeatures">FREE</p>
-          </div>
-          <div class="subtotal">
-            <p class="productFeatures">$300</p>
-          </div>
-          <div class="action">
-            <p class="productFeatures"><a href="#"><i class="fas fa-times-circle"></i></a></p>
-          </div>
-        </div>
-        <div class="shoppingCart-line"></div>
-        <div class="productLine">
-          <div class="productDetails">
-            <div class="productDetails__photo"><a href="#"><img src="img/shopCart_product3.png" alt="t-shirt3"></a>
-            </div>
-            <div class="productDetails__description">
-              <h2>Mango People T-shirt</h2>
-              <p>Color:<span>Red</span></p>
-              <p>Size:<span>Xll</span></p>
-            </div>
-          </div>
-          <div class="unitPrice">
-            <p class="productFeatures">$150</p>
-          </div>
-          <div class="quantity">
-            <input class="productFeatures" type="number">
-          </div>
-          <div class="shipping">
-            <p class="productFeatures">FREE</p>
-          </div>
-          <div class="subtotal">
-            <p class="productFeatures">$300</p>
-          </div>
-          <div class="action">
-            <p class="productFeatures"><a href="#"><i class="fas fa-times-circle"></i></a></p>
-          </div>
+        <div class="prodInCart">
+          <!-- место для рендеринга товров корзины -->
         </div>
         <div class="shoppingCart-line"></div>
         <div class="shoppingCart__function">
-          <input type="reset" class="shoppingCart__function_clear" value="CLEAR SHOPPING CART">
-          <button class="shoppingCart__function_continue">CONTINUE SHOPPING</button>
+          <b>Total quantity: <span class="header__cart-quantity">0</span> </b>
+          <b>Total sum:<span class="header__cart-sum">0</span></b>
         </div>
       </div>
-    </div> -->
-
+    </div>
     <script src="script.js"></script>
 </body>
 
