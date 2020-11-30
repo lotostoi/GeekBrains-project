@@ -1,18 +1,16 @@
-{
-  "amount": 3000,
-  "countGoods": 2,
-  "contents": [
-    {
-      "id": 898,
-      "title": "Computer",
-      "price": 1000,
-      "quantity": 1
-    },
-    {
-      "id": 456,
-      "title": "Keyboard",
-      "price": 2000,
-      "quantity": 1
-    }
-  ]
-}
+[
+  {
+    "id": 3,
+    "title": "MANGO PEOPLE T-SHIRT",
+    "price": 55,
+    "img": "img/item3.png",
+    "quantity": 1
+  },
+  {
+    "id": 5,
+    "title": "MANGO PEOPLE T-SHIRT",
+    "price": 55,
+    "img": "img/item5.png",
+    "quantity": 1
+  }
+]
