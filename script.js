@@ -1,50 +1,21 @@
-// ссылка на каталог товаров в формате json, если вам не показывали как создать такую ссылку в репозитории напиши, я подскажу.
-const CATALOG_URL =
-  'https://raw.githubusercontent.com/lotostoi/GeekBrains-project/homework/responses/catalogData.json'
-// ссылка на корзину товаров в формате json,
-const CART_URL =
-  'https://raw.githubusercontent.com/lotostoi/GeekBrains-project/homework/responses/getBasket.json'
-// проммис для работы с сервером который возвращет данные полученные с сервера в формате json
+// общий путь api(к данным о товарах на сервере), если вам не показывали как создать такую ссылку в репозитории напиши, я подскажу.
+const BASE_URL =
+  'https://raw.githubusercontent.com/lotostoi/GeekBrains-project/homework/responses/'
 
-let makeRequest = (url) =>
-  new Promise((res, rej) => {
-    let xhr
-    if (window.XMLHttpRequest) {
-      xhr = new XMLHttpRequest()
-    } else if (window.ActiveXObject) {
-      xhr = new ActiveXObject('Microsoft.XMLHTTP')
-    }
-    xhr.open('GET', url, true)
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === 4) {
-        if (xhr.status !== 200) {
-          rej('Error')
-        } else {
-          res(xhr.responseText)
-        }
-      }
-    }
-    xhr.open('GET', url, true)
-    xhr.send()
-  })
-// простая функция для работы с сервером, сделанная на основен fetch или промиса makeRequest(который вы делали на основе XMLHttpRequest),
-// она возвращает промис, результатом резолва которого
-// являются данные полученные с сервера в формате json, и распарсенные из  json в обычный js объект,
-// с помощью промиса data.json() (использыется при работе с промисом fetch)
-// или меотда JSON.parse(data) (обычный способ превратить json  в объект js)
-function makeRequestFetch(url) {
-  console.log(url)
-  // использование fetch  намного удобнее поскольку не надо писать промис makeRequest
-  return fetch(url).then((data) => data.json())
-  // работает  также как и строчка выше
-  // return makeRequest(url).then((data) => JSON.parse(data))
+// объект ссылок к json файлам на сервере, для работы с каталогом товаров.
+const CATALOG_URL = { goods: BASE_URL + 'catalogData.json' }
+
+// объект ссылок к json файлам на сервере, для работы с корзиной.
+const CART_URL = {
+  goods: BASE_URL + 'getBasket.json',
+  addById: BASE_URL + 'addToBasket.json',
+  delById: BASE_URL + 'deleteFromBasket.json',
 }
 
 // создаем класс товара каталога
-// основной задачей этого класса на сонове данных о товара создавать объект товара
-
+// основной задачей этого класса на основе данных о товара создавать объект товара
 class Good {
-  // закидываем в конструктор значения полей объекта  одного товара в каталоге
+  // закидываем в конструктор значения полей объекта одного товара в каталоге
   constructor({ id, title, price, img }) {
     // определяем поля класс Good
     this.id = id
@@ -53,36 +24,20 @@ class Good {
     // ссылка на картинку товара
     this.img = img
   }
-  // создаем метод для получения html разментки одного товара с заданными при создании класса параметрами(id.title,price,img)
+  // данная конструкция  ({ id, title, price, img }) означает что в конструктор класса приходит
+  // объект например item который сразу разбирается с помощью деструкторизации то есть код выше можно записать следующим образом
+  // constructor(item) {
+  //   this.id = item.id
+  //   his.title = item.title
+  //   this.price = item.price
+  //   this.img = item.img
+  // }
+  // создаем метод для получения html разметки одного товара с заданными при создании класса параметрами(id.title,price,img)
   rander() {
-    // данная разметка взята из, ниже приведенного, куска твоей верстки, и которую я ее сильно упростил(находится index.html)
-    // оставил только div каталога <div class="catalogue"></div>  и пока закомментированную корзину
+    // данная разметка взята из верстки которую я ее сильно упростил(находится index.html)
+    //  оставил только div каталога <div class="catalogue"></div> и корзину
     // (все остальное на данном этапе лишнее, и будет только сбивать восприятие кода)
-    /*  <div class="container">
-        <div class="catalogue">
-            
-        // кусок разметки который мы будем ипользовать для создaния метода получения html разметки одного товара, с заданными при создании класса, параметрами(id.title,price,img)   
-        <div class="item">
-          <img class="item__photo" src="img/item2.png" alt="item2" />
-          <div class="item-hover">
-            <a href="#">
-              <div class="addCart">
-                <img class="item-cart" src="img/whiteCart.svg" alt="itemCart" />
-                <p class="addCart_text">Add to Cart</p>
-              </div>
-            </a>
-          </div>
-          <div class="item__info">
-            <p class="item__info_name">Mango People T-shirt</p>
-            <p class="item__info_price">$52.00</p>
-          </div>
-        </div>
-         .
-         .
-         .
-        </div>
-    </div>
- */
+
     return ` <div class="item">
                 <img class="item__photo" src="${this.img}" alt="item1" />
                 <div class="item-hover">
@@ -103,46 +58,56 @@ class Good {
 
 // создаем класс каталога . В задачи данного класса входит:
 // 1. формирование html разметки товаров, на основе данных полученных с сервера
-// 2. Взаимодествовать с классом корзины (пока не риализованно)
+// 2. Взаимодействовать с классом корзины
 
 class Goods {
-  // констуктор класса принимает селектор блока в котором будут отрисовываться товары каталога
-  constructor(selector, good, catalogURL) {
-    // создаем поле container в которое заносим елемент dom с
-    // селектором selector(в нашем случае это будет элемент <div class="catalogue"></div>  и соотвественно селектро `.catalogue`)
+  // конструктор класса принимает  selector - селектор блока в котором будут отрисовываться товары каталога
+  //                               classes - объект с названиями внешних классов(Good, Gart ...) которые будут нужны описания данного класса
+  //                               URL - объект с ссылками к api которые потребуются для работы создаваемого класса
+  constructor(selector, classes, URL) {
+    // создаем поле container в которое заносим элемент dom с
+    // селектором selector(в нашем случае это будет элемент <div class="catalogue"></div>  и соответственно селектор`.catalogue`)
     this.container = document.querySelector(selector)
     // создаем поле в котором будут хранится данные о товарах полученные с сервера
     this.allGoods = []
     // создаем поле в котором будут хранится данные для отображения на странице,
-    // данное поле формируется на совное поля  this.allGoods, и в момент создания класса оно равно this.allGoods
+    // данное поле формируется на основе поля  this.allGoods, и в момент создания класса оно равно this.allGoods
     // однако оно может меняться если мы например захотим делать фильтрацию товаров например по названию и т.д.
     // (этот момент может быть по началу непонятным)
     this.GoodsForShow = []
-    this.url = catalogURL
-    this.good = good
-    this.cart = null
-    // внутрений метод класса который запускает методы, которые должны сработать в момент создания класса
+    // определяем поле ссылок ссылками к api которые потребуются для работы класса
+    this.url = URL
+    // определяем пола дополнительных классов
+    this.good = classes.good ? classes.good : null
+    this.cart = classes.cart ? classes.cart : null
+    // вызываем внутренний метод который запускает методы, которые должны сработать в момент создания класса
     this._init()
   }
-  // опредялем метод _init()
+  // определяем метод _init()
   _init() {
     // при создании класса мы сначала должны получить товары с сервера
-    // в данном случае мы это делаем с помощью внешней функции описаной выше на строке 31
-    return makeRequestFetch(this.url)
-      .then((data) => {
-        //  после вызова промиса makeRequestFetch(CATALOG_URL), данные о товараx попадают в поле data
-        //  можно написать console.log(data) что бы  посмотреть как эти данные выглядят в консоли
-        //  CATALOG_URL путь к файлу с  данными о товарах в формате json, который лежит на сервере (задан в строке 2)
-
-        // в момент создания класса this.allGoods = this.GoodsForShow, и в них мы заносим данные из data
-        this.allGoods = data
-        this.GoodsForShow = data
-        //  вызывем метод _rander()  который на основе данных из this.GoodsForShow сформирует html  разметку
-        //  товров в эелемете this.container = document.querySelector(selector)
-        //  данный метод описан ниже
-        this._rander()
-      })
-      .then(() => this._handler())
+    // в данном случае мы это делаем с помощью внешней функции описанной в конце данного файла
+    return (
+      makeRequestFetch(this.url.goods)
+        .then((data) => {
+          //  после вызова промиса makeRequestFetch(this.url.goods), данные о товараx попадают в поле data
+          //  можно написать console.log(data) что бы  посмотреть как эти данные выглядят в консоли
+          //  this.url.goods путь к файлу с данными о товарах в формате json, который лежит на сервере
+          //  в момент создания класса this.allGoods = this.GoodsForShow, и в них мы заносим данные из data
+          this.allGoods = this.GoodsForShow = data
+          //  вызываем метод _rander() который на основе данных из this.GoodsForShow сформирует html разметку
+          //  товаров в элементе this.container = document.querySelector(selector)
+          //  данный метод описан ниже
+          this._rander()
+        })
+        // после того как наша разметка отрисованна, с помощью метода ._handler()(который описан ниже),
+        // навешиваем необходимые обработчики на элемента DOM tree ( в данном случае речь идет кнопка 'add to cart')
+        .then(() => this._handler())
+        // если во время выполнения данной цепочки промисов возникла ошибка выводим ее в консоль
+        .catch((e) => {
+          console.error(e)
+        })
+    )
   }
 
   _rander() {
@@ -150,40 +115,46 @@ class Goods {
     this.container.innerHTML = ''
     // пробегаем по массиву  this.allGoods(с данными о товарах) методом forEach
     this.allGoods.forEach((good) => {
-      // выше мы опредили класc Good (строка 40)
+      // выше мы определили класс Good (строка 40)
       // далее на его основе мы будем создавать объекты товара в каталоге
       // поскольку каждый good в массиве this.allGoods имеет следующую
       // структуру {id: 1, title: "MANGO PEOPLE T-SHIRT", price: 55, img: "img/item1.png"}
       // мы можем создать объект товара, при помощи, ранее описанного, класса Good следующим образом
       let newGood = new this.good(good)
-      // далее используя метод render у созданного объекта товара newGood мы можем дабавить
+      // далее используя метод render у созданного объекта товара newGood мы можем добавить
       // его html разметку this.container = document.querySelector(selector)
       this.container.insertAdjacentHTML('beforeend', newGood.rander())
-      // поскольку это тело цикла, после его кончания на странице будут отображены все товары из массива this.allGoods
+      // поскольку это тело цикла, после его окончания на странице будут отображены все товары из массива this.allGoods
     })
   }
 
   _handler() {
+    // создаем обработчик кликов для кнопок "Add to Cart"
     this.container.addEventListener('click', (e) => {
       if (e.target.dataset.idAdd) {
+        // в момент клика по кнопке используя значение data атрибута кнопки, определяем ID
+        // товара, и находим этот товар в массиве товаров this.allGoods
         let item = this.allGoods.find((g) => +g.id === +e.target.dataset.idAdd)
+        // поскольку поле класса this.cart содержит ссылку на класс корзины, мы можем добавить найденный товар (item),
+        // в корзину, вызывав метод корзины(который описан в ее классе) следующим образом:
         this.cart.addItem(item)
       }
     })
   }
 }
 
-// теперь вызываем вышеописанный класс Doods и в конструктор класса передаем селектр эламента(div)
-// в котором мы хотим отобразить товары
-// вызов этого класса запустит внутренний методо init()
-// в котором с помощью промисса makeRequestFetch будут получены данные о товрах в сервера
-// и затем с помощью метода _rander() эти данные будут отрисованы на странице (файл index.html)
-
+// создаем класс товара корзины на основе класса для товара каталога(суть создания данного класса описана выше )
 class GoodInCart extends Good {
-  constructor({ id, title, price, img, quantity, shipping }) {
-    super({ id, title, price, img, quantity, shipping })
+  constructor({ id, title, price, img, quantity }) {
+    // super({ id, title, price, img, quantity }) - вызываем конструктор родительского класса
+    // данна процедура выполняет следующие действия
+    /*  this.id = id
+        this.title = title
+        this.price = price
+        this.img = img
+      */
+    super({ id, title, price, img, quantity })
     this.quantity = quantity
-    this.shipping = shipping
   }
   rander() {
     return `
@@ -204,10 +175,7 @@ class GoodInCart extends Good {
         <p class="productFeatures">$${this.price}</p>
       </div>
       <div class="quantity">
-        <input class="productFeatures" type="number" value="${this.quantity}">
-      </div>
-      <div class="shipping">
-        <p class="productFeatures">${this.shipping}</p>
+        <p class="productFeatures">${this.quantity}</p>
       </div>
       <div class="subtotal">
         <p class="productFeatures">${this.quantity * this.price}</p>
@@ -222,26 +190,48 @@ class GoodInCart extends Good {
   }
 }
 
+// Создаем класс корзины . В задачи данного класса входит:
+// 1. формирование html разметки корзины
+// 2. Удаление/добавление ... товаров в корзине
+// данный класс создается на основе класса Goods, то есть 
+// в нем по наследству в нем уже будут такие метода как  _init(), _rander() и _handler().
+// Однако для корректной работы данного класса нам потребуется 
+// немного изменить  методы _init() и _handler()
 class Cart extends Goods {
-  constructor(selector, good, catalogURL) {
-    super(selector, good, catalogURL)
+  constructor(selector, good, URL) {
+    // вызов super вызывает конструктор родительского класса тем самым позволяет нам не
+    // писать следующий код:
+    /* constructor(selector, classes, URL) {
+            this.container = document.querySelector(selector)
+            this.allGoods = []
+            this.GoodsForShow = []
+            this.url = URL
+            this.good = classes.good ? classes.good : null
+            this.cart = classes.cart ? classes.cart : null
+            this._init()
+      }*/
+    super(selector, good, URL)
   }
-
+  // переопределяем метод родительского класса _init()
   _init() {
-    super._init().then(() => {
-      this.allQuantity = this.clacAllQuantity()
-      this.allSum = this.clacAllSum()
-    })
+    // вызываем метод родительского класса и поскольку он является промисом в
+    // следующем then дописываем необходимый для работы корзины функционал,  а именно устанавливаем в
+    // реактивные поля this.allQuantity и this.allSum (определены ниже на основе геттеров и сеттеров)
+    // значения общего количества товаров  и общей стоимости корзины(с помощью методов данного класса clacAllQuantity()
+    // и  this.clacAllSum() описанных ниже)
+    super
+      ._init()
+      .then(() => {
+        this.allQuantity = this.clacAllQuantity()
+        this.allSum = this.clacAllSum()
+      })
+      .catch((e) => {
+        console.error(e)
+      })
   }
-
-  _rander() {
-    this.container.innerHTML = ''
-    this.allGoods.forEach((good) => {
-      let newGood = new this.good({ ...good, shipping: 'FREE' })
-      this.container.insertAdjacentHTML('beforeend', newGood.rander())
-    })
-  }
-
+  // переопределяем родительский обработчик, по сути он работает так же как и родительский,
+  // только здесь он навешивается на другие кнопки, и поскольку сейчас  мы находимся непосредственно
+  // в самом классе корзины мы можем просто использовать ее метод.
   _handler() {
     this.container.addEventListener('click', (e) => {
       if (e.target.dataset.idDel) {
@@ -251,20 +241,30 @@ class Cart extends Goods {
     })
   }
 
+  // *** определяем геттер общего количества товаров в корзине
+  // *** данный участок кода является сложным для новичков, его можно пропустить
+  // *** и попытаться понять в свободное время, когда другие темы будут поняты
   get allQuantity() {
     return this._allQuantity
   }
-
+  // *** определяем геттер общего количества товаров в корзине
+  // *** данный участок кода является сложным для новичков, его можно пропустить
+  // *** и попытаться понять в свободное время, когда другие темы будут поняты
   set allQuantity(val) {
     this._allQuantity = val
     let event = new Event('setAllQuantity')
     document.querySelector('body').dispatchEvent(event)
     return true
   }
+  // *** определяем геттер общего количества товаров в корзине
+  // *** данный участок кода является сложным для новичков, его можно пропустить
+  // *** и попытаться понять в свободное время, когда другие темы будут поняты
   get allSum() {
     return this._allSum
   }
-
+  // *** определяем геттер общего количества товаров в корзине
+  // *** данный участок кода является сложным для новичков, его можно пропустить
+  // *** и попытаться понять в свободное время, когда другие темы будут поняты
   set allSum(val) {
     this._allSum = val
     let event = new Event('setAllSum')
@@ -272,10 +272,36 @@ class Cart extends Goods {
     return true
   }
 
+  // Метод для реактивного изменения .innerHTML дом элементов.
+  // данный метод будет устанавливать значение this.allQuantity(общее количество товаров корзины)
+  // в элементы с селекторами определенными в selectors
+  // *** данный участок кода является сложным для новичков, его можно пропустить
+  // *** и попытаться понять в свободное время, когда другие темы будут поняты
+  setAllQuantity(selectors) {
+    document.querySelector('body').addEventListener('setAllQuantity', (e) => {
+      let val = this.allQuantity + 'шт.'
+      // вспомогательная функция определенная в конце данного файла
+      setContentInElements(selectors, val)
+    })
+  }
+  // Метод для реактивного изменения .innerHTML дом элементов.
+  // данный метод будет устанавливать значение this.allSum(общее количество товаров корзины)
+  // в элементы с селекторами определенными в selectors
+  // *** данный участок кода является сложным для новичков, его можно пропустить
+  // *** и попытаться понять в свободное время, когда другие темы будут поняты
+  setAllSum(selectors) {
+    document.querySelector('body').addEventListener('setAllSum', (e) => {
+      let val = '$' + this.allSum
+      // вспомогательная функция определенная в конце данного файла
+      setContentInElements(selectors, val)
+    })
+  }
+
+  // метод для расчета общего количества товаров в корзине
   clacAllQuantity() {
     return this.GoodsForShow.reduce((accum, g) => accum + g.quantity, 0)
   }
-
+  // метод для расчета полной суммы корзины
   clacAllSum() {
     return this.GoodsForShow.reduce(
       (accum, g) => accum + g.quantity * g.price,
@@ -283,66 +309,92 @@ class Cart extends Goods {
     )
   }
 
-  setAllQuantity(selector) {
-    document.querySelector('body').addEventListener('setAllQuantity', (e) => {
-      let val = this.allQuantity + 'шт.'
-      setContentInElements(selector,val)
-    })
+  // дополнительный метод, который нужно вызывать когда массив с
+  // товарами корзины изменился(добавили товара, удалили товар).
+  _reRender() {
+    this.allQuantity = this.clacAllQuantity()
+    this.allSum = this.clacAllSum()
+    this._rander()
   }
-  setAllSum(selector) {
-    document.querySelector('body').addEventListener('setAllSum', (e) => {
-      let val ='$' + this.allSum
-      setContentInElements(selector,val)
-    })
-  }
-
+  // метод для добавления товара в корзину
   addItem(item) {
-    let good = this.GoodsForShow.find((g) => g.id === item.id)
-    if (good) {
-      good.quantity++
-    } else {
-      this.GoodsForShow.push({ ...item, quantity: 1, shipping: 'FREE' })
-    }
-    console.log(this.GoodsForShow)
-    this.allQuantity = this.clacAllQuantity()
-    this.allSum = this.clacAllSum()
-    this._rander()
+    // делаем запрос на сервер, на разрешение добавления товара в корзину  
+    makeRequestFetch(this.url.addById)
+      .then(({ result }) => {
+        // если сервер ответил {"result":1} то добавляем товара 
+        if (result) {
+          // ищем товар item в корзине по id
+          let good = this.GoodsForShow.find((g) => g.id === item.id)
+          // если товар с в корзине есть
+          if (good) {
+            //  увеличиваем его количество на 1
+            good.quantity++
+          } else {
+            // если такого товара в корзине нету то добавляем его в корзину  
+            this.GoodsForShow.push({ ...item, quantity: 1 })
+          }
+          // с помощью метода _reRender() обновляем данные о корзине в HTML разметке
+          this._reRender()
+        } else {
+          // если сервер ответил ответом отличным от {"result":1} , выбрасываем ошибку
+          throw new Error("Server's answer isn't correct...")
+        }
+      })
+      .catch((e) => {
+        // если при обращению к серверу возникла  ошибка выводим ее в консоль
+        console.error(e)
+      })
   }
-
+ // метод для удаления товара из корзины или уменьшения его количества
   removeItem(item) {
-    let good = this.GoodsForShow.find((g) => g.id === item.id)
-    if (good.quantity > 1) {
-      good.quantity--
-    } else {
-      let idx = this.GoodsForShow.findIndex((g) => g.id === item.id)
-      this.GoodsForShow.splice(idx, 1)
-    }
-    this.allQuantity = this.clacAllQuantity()
-    this.allSum = this.clacAllSum()
-    this._rander()
+    // делаем запрос на сервер, на разрешение удаления товара из корзины или уменьшения его количества
+    makeRequestFetch(this.url.delById)
+      .then(({ result }) => {
+        if (result) {
+          // если сервер ответил {"result":1} то ищем товар item в корзине по id
+          let good = this.GoodsForShow.find((g) => g.id === item.id)
+          if (good.quantity > 1) {
+            // если количество данного товара в корзине < 1 то уменьшаем его н 1
+            good.quantity--
+          } else {
+            // если количество данного товара в корзине = 1 то удаляем его из массива товаров корзины 
+            let idx = this.GoodsForShow.findIndex((g) => g.id === item.id)
+            this.GoodsForShow.splice(idx, 1)
+          }
+          this._reRender()
+        } else {
+          // если сервер ответил ответом отличным от {"result":1} , выбрасываем ошибку
+          throw new Error("Server's answer isn't correct...")
+        }
+      })
+      .catch((e) => {
+        // если при обращению к серверу возникла  ошибка выводим ее в консоль
+        console.error(e)
+      })
   }
 }
 
-let CartShop = new Cart('.prodInCart', GoodInCart, CART_URL)
+// Вызываем вышеописанный класс Cart и в конструктор класса 
+// передаем необходимые параметры(описание которых есть в классе Goods) 
+// Вызов этого класса запустит внутренний метод init()
+// в котором с помощью промисса makeRequestFetch будут получены данные о товарах  корзины с сервера
+// и затем с помощью метода _rander() эти данные будут отрисованы на странице(корзины) (файл index.html)
+let CartShop = new Cart('.prodInCart', { good: GoodInCart }, CART_URL)
 
+// определяем дом элементы в которых  мы хотим отображать общее количество товаров в корзине 
 CartShop.setAllQuantity('.header__cart-quantity')
+// определяем дом элементы в которых  мы хотим отображать полную стоимость корзины 
 CartShop.setAllSum('.header__cart-sum')
 
-let Catalog = new Goods('.catalogue', Good, CATALOG_URL)
+// Вызываем вышеописанный класс Doods и в конструктор класса 
+// передаем необходимые параметры(описание которых есть в классе Goods) 
+// Вызов этого класса запустит внутренний метод init()
+// в котором с помощью промисса makeRequestFetch будут получены данные о товарах каталога с сервера
+// и затем с помощью метода _rander() эти данные будут отрисованы на странице(каталога) (файл index.html)
+new Goods('.catalogue', { good: Good, cart: CartShop }, CATALOG_URL)
 
-Catalog.cart = CartShop
 
-
-
-function setContentInElements(selectors, value) {
-  if (typeof selectors === 'string') {
-    let elements =[... document.querySelectorAll(selectors)]
-    elements.forEach(e=> {
-      e.innerHTML = value
-    })
-  }
-}
-
+//обработчик для переключения между каталогом и корзиной на странице проекта
 document.querySelector('body').addEventListener('click', (e) => {
   if (e.target.classList.contains('header__cart')) {
     document.querySelector('.catalogue').classList.add('hiden')
@@ -353,3 +405,52 @@ document.querySelector('body').addEventListener('click', (e) => {
     document.querySelector('.catalogue').classList.remove('hiden')
   }
 })
+
+// дополнительная функция для задания innerHTML элементов дом с определенными селекторами, значения value 
+function setContentInElements(selectors, value) {
+  if (typeof selectors === 'string') {
+    let elements = [...document.querySelectorAll(selectors)]
+    elements.forEach((e) => {
+      e.innerHTML = value
+    })
+  } else {
+    // надо дописать для массива селекторов
+  }
+}
+
+// простая функция для работы с сервером, сделанная на основен fetch или промиса makeRequest(который вы делали на основе XMLHttpRequest),
+// она возвращает промис, результатом резолва которого
+// являются данные полученные с сервера в формате json, и распарсенные из  json в обычный js объект,
+// с помощью промиса data.json() (используется при работе с промисом fetch)
+// или метода JSON.parse(data) (обычный способ превратить json  в объект js)
+function makeRequestFetch(url) {
+  // использование fetch  намного удобнее поскольку не надо писать промис makeRequest
+  return fetch(url).then((data) => data.json())
+  // работает  также как и строчка выше
+  // return makeRequest(url).then((data) => JSON.parse(data))
+}
+
+
+// промис makeRequest на основе XMLHttpRequest, древность, лучше не использовать.
+function makeRequest(url) {
+  return new Promise((res, rej) => {
+    let xhr
+    if (window.XMLHttpRequest) {
+      xhr = new XMLHttpRequest()
+    } else if (window.ActiveXObject) {
+      xhr = new ActiveXObject('Microsoft.XMLHTTP')
+    }
+    xhr.open('GET', url, true)
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        if (xhr.status !== 200) {
+          rej('Error')
+        } else {
+          res(xhr.responseText)
+        }
+      }
+    }
+    xhr.open('GET', url, true)
+    xhr.send()
+  })
+}
